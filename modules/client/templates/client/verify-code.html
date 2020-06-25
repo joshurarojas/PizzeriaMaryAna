@@ -1,0 +1,27 @@
+{% extends 'client/layout.html' %}
+{% block title %}Recuperar contraseña{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="/" class="black-text">Inicio</a></li>
+<li class="breadcrumb-item active">Recuperar contraseña</li>
+{% endblock %}
+{% block content %}
+<div class="jumbotron">
+    <h2 class="mb-40">Recuperaci&oacute;n de contraseña</h2>
+    <div class="all-width">
+        <div class="col-md-8 m-0-auto">
+                {% if request.args.get('status') == 'wrongCode' %}
+                    <div class="alert alert-danger" role="alert">
+                        El c&oacute;digo ingresado es incorrecto. Por favor revise nuevamente el c&oacute;digo enviado a su correo.
+                    </div>
+                {% endif %}
+            <form action="/account/confirm_password_reset_code" method="POST">
+                <div class="form-group">
+                    <label for="restoreCode" class="animated-label">Ingrese el c&oacute;digo enviado a su correo</label>
+                    <input type="text" name="restoreCode" id="restoreCode" class="form-control" placeholder="Ingrese el codigo">
+                </div>
+                <button type="submit" class="btn btn-amber">Verificar</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

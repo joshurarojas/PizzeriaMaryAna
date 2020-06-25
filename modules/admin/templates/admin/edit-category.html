@@ -1,0 +1,56 @@
+{% extends 'admin/layout.html' %}
+{% block content %}
+
+<div class="box col-md-8">
+    <div class="box-header with-border">
+      <h3 class="box-title">Editar una categoría</h3>
+    </div>
+    <!-- /.box-header -->
+    <!-- form start -->
+    <form action="/admin/categories/edit" class="form-horizontal"  method="POST" enctype="multipart/form-data">
+      <div class="box-body">
+            <div class="col-md-4 p-0">
+                <input type="number" name="categoryId" id="categoryId" value="{{categoryData.0}}" readonly hidden>
+                <div class="mb-6">
+                    <label for="categoryName">Nombre de la categoría</label>
+                    <input type="text" class="form-control" name="categoryName" id="categoryName" value="{{categoryData.1}}" required>
+                </div>
+                <div class="mb-6" >
+                    <label for="">Imagen actual</label>
+                    <img class="category-img" src="{{ url_for('static', filename='client/' + categoryData.2) }}" alt="">
+                </div>
+                <div class="">
+                     <label for="categoryImg">Seleccionar una nueva imagen</label>
+                     <input type="file" class="form-control mb-6" name="categoryImg" id="categoryImg" accept="image/*" required>
+                     <img class="category-img" id="newImg" src="{{ url_for('static', filename='client/img/categories/no-image.jpg') }}" alt="">
+                </div>
+            </div>
+      </div>
+      <!-- /.box-body -->
+      <div class="box-footer margin-left">
+            <a class="btn btn-danger mr-6" href="/admin/categories"><i class="fas fa-arrow-circle-left mr-6"></i>Regresar</a>
+            <button type="submit" class="btn btn-primary" ><i class="fas fa-save mr-6"></i>Guardar</button>
+      </div>
+      <!-- /.box-footer -->
+    </form>
+  </div> 
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function filePreview(input) {
+    if(input.files && input.files[0]) {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            document.querySelector('#newImg').src = e.target.result;
+        }
+        reader.readAsDataURL(input.files[0]);
+    }    
+}
+$('#categoryImg').on('change', function() {
+    filePreview(this);
+});
+</script>
+
+{% endblock %}

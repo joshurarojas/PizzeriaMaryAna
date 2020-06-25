@@ -1,0 +1,211 @@
+{% extends 'client/layout.html' %}
+{% block meta %}
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+{% endblock %}
+{% block title %}Mi cuenta{% endblock %}
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a class="black-text" href="/">Inicio</a></li>
+    <li class="breadcrumb-item active">Mi cuenta</li>
+{% endblock %}
+{% block content %}
+<div class="desktop-section" id="wrapper">
+    <div class="bg-light border-right sidebar-wrapper">
+        <div class="sidebar-heading mt-40">
+            {% if clientData.client_img_route == '' %}
+            <img src="{{ url_for('static', filename='client/img/profiles/no_image.jpg') }}" class="profile-img" />
+            {% else %}                    
+            <img src="{{ url_for('static', filename='client/' + clientData.client_img_route) }}" class="profile-img" />
+            {% endif %}
+            <button class="btn-update-profile-img" id="btn-update-profile-img">Cambiar</button>
+        </div>
+        <div class="list-group list-group-flush" id="desktop-form-tabs">
+            <a href="" data-pointer="desktopTabOne" class="list-group-item list-group-item-action bg-light">Datos personales</a>
+            {% if clientData.client_activated == 0 %}
+            <a href="" data-pointer="desktopTabTwo" class="list-group-item list-group-item-action bg-light">Verificar correo</a>
+            {% endif %}
+            <a href="" data-pointer="desktopTabThree" class="list-group-item list-group-item-action bg-light">Cambiar contraseña</a>
+        </div>
+    </div>
+    <div class="account-section w-100 page-content-wrapper" id="desktopTabsContainer">
+        <section id="desktopTabOne">
+            <form action="/account/update" method="POST">
+                <div class="form-group">
+                    <label class="animated-label" for="clientEmail">Correo electr&oacute;nico</label>
+                    <input class="form-control" type="text" name="clientEmail" id="clientEmail" value="{{ session['email'] }}" readonly disabled>
+                </div>
+                <div class="form-group">
+                    <label class="animated-label" for="clientName">Nombre completo</label>
+                    <input class="form-control" type="text" name="clientName" id="clientName" value="{{ clientData.client_name }}">
+                </div>
+                <div class="form-group">
+                    <label class="animated-label" for="clientPhone">N&uacute;mero de tel&eacute;fono</label>
+                    <input class="form-control" type="number" name="clientPhone" id="clientPhone" value="{{ clientData.client_phone }}">
+                </div>
+                <button class="btn btn-success" type="submit">Actualizar Informaci&oacute;n</button>
+            </form>        
+        </section>
+        {% if clientData.client_activated == 0 %}
+        <section id="desktopTabTwo">
+            <form action="/account/verify" method="POST">
+                <div class="form-group">
+                    <label class="animated-label" for="clientEmail">C&oacute;digo para verificar el correo:</label>
+                    <input class="form-control" type="text" name="clientCode" id="clientCode">
+                    <small class="form-text text-muted">El c&oacute;digo fue enviado al correo electr&oacute;nico provisto al registrarse.</small>
+                </div>
+                <button class="btn btn-success" type="submit">Verificar correo</button>
+            </form>
+        </section>
+        {% endif %}
+        <section id="desktopTabThree" class="d-none">
+            <form action="/account/password_update" method="POST">
+                <div class="form-group">
+                    <label class="animated-label" for="oldPassword">Contraseña actual</label>
+                    <input class="form-control" type="password" name="oldPassword" id="oldPassword" placeholder="Ingrese su contraseña actual" />
+                </div>
+                <div class="form-group">
+                    <label class="animated-label" for="newPassword">Nueva contraseña</label>
+                    <input class="form-control" type="password" name="newPassword" id="newPassword" placeholder="Ingrese su nueva contraseña" />
+                </div>
+                <button class="btn btn-success" type="submit">Cambiar contraseña</button>
+            </form>
+        </section>
+        <section id="changeProfileImageTab" class="d-none">
+            <form action="/account/profile_image_change" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="animated-label" for="profileImage">Seleccionar imagen</label>
+                    <input class="form-control mb-3" type="file" name="profileImage" id="profileImage" accept="image/png,image/jpeg" />
+                    <label class="animated-label">Vista previa de la imagen</label>
+                    {% if clientData.client_img_route == '' %}
+                    <img id="profileImagePreview" src="{{ url_for('static', filename='client/img/profiles/no_image.jpg') }}" />
+                    {% else %}                    
+                    <img id="profileImagePreview" src="{{ url_for('static', filename='client/' + clientData.client_img_route) }}" />
+                    {% endif %}
+                </div>
+                <button class="btn btn-success" type="submit">Guardar nueva imagen</button>
+            </form>
+        </section>
+    </div>
+</div>
+<div class="mobile-section">
+    <ul class="nav nav-tabs" id="form-tabs">
+        <li class="nav-item">
+            <a href="#tabOne" class="nav-link active">Datos personales</a>
+        </li>
+        {% if clientData.client_activated == 0 %}
+        <li class="nav-item">
+            <a href="#tabTwo" class="nav-link">Verificar correo</a>
+        </li>
+        {% endif %}
+        <li class="nav-item">
+            <a href="#tabThree" class="nav-link">Cambiar contraseña</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="tabOne">
+            <form action="/account/update" method="POST">
+                <div class="form-group">
+                    <label class="animated-label" for="clientEmail">Correo electr&oacute;nico</label>
+                    <input class="form-control" type="text" name="clientEmail" id="clientEmail" value="{{ session['email'] }}" readonly disabled>
+                </div>
+                <div class="form-group">
+                    <label class="animated-label" for="clientName">Nombre completo</label>
+                    <input class="form-control" type="text" name="clientName" id="clientName" value="{{ clientData.client_name }}">
+                </div>
+                <div class="form-group">
+                    <label class="animated-label" for="clientPhone">N&uacute;mero de tel&eacute;fono</label>
+                    <input class="form-control" type="number" name="clientPhone" id="clientPhone" value="{{ clientData.client_phone }}">
+                </div>
+                <button class="btn btn-success" type="submit">Actualizar Informaci&oacute;n</button>
+            </form>
+        </div>
+        {% if clientData.client_activated == 0 %}
+        <div class="tab-pane" id="tabTwo">
+            <form action="/account/verify" method="POST">
+                <div class="form-group">
+                    <label class="animated-label" for="clientEmail">C&oacute;digo para verificar el correo:</label>
+                    <input class="form-control" type="text" name="clientCode" id="clientCode">
+                    <small class="form-text text-muted">El c&oacute;digo fue enviado al correo electr&oacute;nico provisto al registrarse.</small>
+                </div>
+                <button class="btn btn-success" type="submit">Verificar correo</button>
+            </form>
+        </div>
+        {% endif %}
+        <div class="tab-pane" id="tabThree">
+            <form action="/account/password_update" method="POST">
+                <div class="form-group">
+                    <label class="animated-label" for="oldPassword">Contraseña actual</label>
+                    <input class="form-control" type="password" name="oldPassword" id="oldPassword" placeholder="Ingrese su contraseña actual" />
+                </div>
+                <div class="form-group">
+                    <label class="animated-label" for="newPassword">Nueva contraseña</label>
+                    <input class="form-control" type="password" name="newPassword" id="newPassword" placeholder="Ingrese su nueva contraseña" />
+                </div>
+                <button class="btn btn-success" type="submit">Cambiar contraseña</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    // This method shows a preview of the profile image
+    let previewImage = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            let reader = new FileReader();
+            reader.onload = function(ev) {
+                document.querySelector('#profileImagePreview').src = ev.target.result;
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    }
+    // This method shows change profile image tab
+    let showChangeProfileImageTab = () => {
+        $('#desktopTabsContainer section').each(function() {
+            if (this.id === 'changeProfileImageTab') {
+                this.classList.remove('d-none');
+            } else {
+                this.classList.add('d-none');
+            }
+        });
+    }
+    document.querySelector('#profileImage').addEventListener('change', previewImage);
+    // This section shows the change profile image section
+    document.querySelector('#btn-update-profile-img').addEventListener('click', showChangeProfileImageTab);
+    // This section is abount changing mobile section tabs
+    $('#form-tabs a').click(function (e) {
+        e.preventDefault();
+        $(this).tab('show');
+    });
+    // This section is about changing desktop section tabs
+    $('#desktop-form-tabs a').click(function (e) {
+        e.preventDefault();
+        let tabToShow = $(this).data('pointer');
+        $('#desktopTabsContainer section').each(function() {
+            if (this.id === tabToShow) {
+                this.classList.remove('d-none');
+            } else {
+                this.classList.add('d-none');
+            }
+        });
+    });
+
+    let updateMessage={{ request.args.get('update')|tojson|safe }};
+    let verifyMessage={{ request.args.get('verify')|tojson|safe }};
+
+    if (updateMessage) {
+        showNotification('Datos actualizados correctamente', 'success');
+    }
+
+    if (verifyMessage) {
+        if (verifyMessage === 'success') {
+            showNotification('Correo verificado correctamente', 'success');
+        } else if (verifyMessage === 'already') {
+            showNotification('El correo ya ha sido verificado', 'info');
+        } else {
+            showNotification('El código provisto es incorrecto', 'error')
+        }
+    }
+</script>
+{% endblock %}

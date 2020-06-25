@@ -1,0 +1,71 @@
+{% extends 'client/layout.html' %}
+{% block title %}Productos{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a class="black-text" href="/">Inicio</a></li>
+<li class="breadcrumb-item"><a class="black-text" href="/menu">Men&uacute;</a></li>
+<li class="breadcrumb-item active">{{ categoryName }}</li>
+{% endblock %}
+{% block content %}
+    <h2 class="mt-40">{{ categoryName }}</h2>
+    <div class="row">
+    {% for product in productsData %}
+        <div class="col-sm-6 col-md-4 col-lg-3">
+            <div id="product-card-{{ product[0] }}" class="card">
+                <a href="/menu/product/details?categoryId={{ product[1] }}&productId={{ product[0] }}"></a>
+                <img class="card-img-top" src="{{ url_for('static', filename='client/' + product[4]) }}" alt="Card image cap">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">{{ product[2] }}</h5>
+                    <div class="card-buttons mb-3">
+                        <a href="/menu/product/details?categoryId={{ product[1] }}&productId={{ product[0] }}" class="btn btn-danger btn-sm">Leer m&aacute;s</a>
+                        <a id="btn-add-to-cart-{{ product[0] }}" onclick="showAddToCartContainer({{ product[0]|safe }});" class="pointer btn-add-to-cart"><i class="fas fa-shopping-cart"></i></a>
+                        <!-- <a href="#" id="btn-add-to-cart-{{ product[0] }}" onclick="showAddToCartContainer({{ product[0]|safe }});" class="btn btn-dark btn-add-cart float-right"><i class="fas fa-shopping-basket"></i></a> -->
+                    </div>
+                    <div id="add-to-cart-{{ product[0] }}" style="display: none;">
+                        <form>
+                            <select name="" id="" class="form-control form-control-sm mb-3">
+                                <option value="0" selected disabled>Tamaño</option>
+                            </select>
+                            <button class="btn btn-danger btn-sm col-12" type="submit">Agregar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+    <div class="darkness"></div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        window.addEventListener('click', e => {
+            let index = sessionStorage['index'];
+            let divProductCard = document.querySelector(`#product-card-${index}`);
+            let divAddToCart = document.querySelector(`#add-to-cart-${index}`);
+            let btnAddToCart = document.querySelector(`#btn-add-to-cart-${index}`);
+
+            if (divProductCard !== null) {
+                if (divProductCard.contains(e.target)) {
+                } else {
+                    sessionStorage.clear();
+                    divProductCard.style.zIndex = 5;
+                    divAddToCart.style.display = 'none';
+                    btnAddToCart.style.display = 'block';
+                    document.querySelector('.darkness').style.display = 'none';
+                }
+            }
+        })
+        function showAddToCartContainer(index) {
+            sessionStorage.clear();
+            sessionStorage['index'] = index;
+
+            let divProductCard = document.querySelector(`#product-card-${index}`);
+            let divAddToCart = document.querySelector(`#add-to-cart-${index}`);
+            let btnAddToCart = document.querySelector(`#btn-add-to-cart-${index}`);
+
+            divProductCard.style.zIndex = 10;
+            btnAddToCart.style.display = 'none';
+            divAddToCart.style.display = 'block';
+            document.querySelector('.darkness').style.display = 'block';
+        }
+    </script>
+{% endblock %}

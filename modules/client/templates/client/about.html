@@ -1,0 +1,75 @@
+{% extends 'client/layout.html' %}
+{% block title %}Nosotros{% endblock %}
+{% block styles %}
+<style>
+.youtube-video-container {
+    height: 285px;
+}
+@media only screen and (min-width: 768px) {
+    .youtube-video-container {
+        height: 388px;
+    }   
+}
+@media only screen and (min-width: 992px) {
+    .youtube-video-container {
+        height: 523px;
+    }   
+}
+@media only screen and (min-width: 1200px) {
+    .youtube-video-container {
+        height: 625px;
+    }   
+}
+</style>
+{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a class="black-text" href="/">Inicio</a></li>
+<li class="breadcrumb-item active">Nosotros</li>
+{% endblock %}
+{% block content %}
+<h2 class="mt-40 mb-20">Nuestra misión</h2>
+<div class="jumbotron wrapper">
+    <div class="row">
+        <div class="wrapper-left col-12 col-md-8">
+            <p> Somos una pequeña empresa dedicada a la preparación y comercialización de alimentos.
+                Ofreciendo una gran variedad en nuestros productos, siempre manteniendo altos estándares con
+                respecto a
+                los
+                ingredientes empleados y el proceso preparación;
+                para que, al momento de adquirir nuestros comestibles, los clientes obtengan el mejor beneficio
+                con
+                respecto
+                al sabor,
+                presentación y precio, de manera tal que sus expectativas sean sobrepasadas.
+            </p>
+        </div>
+        <div class="wrapper-right col-md-4 background0ne">
+        </div>
+    </div>
+</div>
+<h2 class="mt-40 mb-20">Nuestra visión</h2>
+<div class="jumbotron wrapper">
+    <div class="row">
+        <div class="wrapper-left col-12 col-md-8">
+            <p>
+                Restaurante y Pizzería “Mar y Ana” busca ser reconocidos como un restaurante de prestigio y
+                confiable, en
+                donde
+                sus instalaciones brindan
+                una excelente experiencia al usuario con platillos que sean agradables al paladar por su calidad y
+                sabor;
+                además, de contar un ambiente relajado y placentero,
+                apoyados de un personal altamente calificado.
+            </p>
+        </div>
+        <div class="wrapper-right col-md-4 backgroundtwo">
+        </div>
+    </div>
+</div>
+<h2 class="mt-20">Sobre nuestros productos</h2>
+<div class="col-12 p-0 mt-4 mb-0">
+    <div class="youtube-video-container">
+        <iframe class="youtube-iframe" src="https://www.youtube.com/embed/loN_-EZRczI" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+</div>
+{% endblock %}

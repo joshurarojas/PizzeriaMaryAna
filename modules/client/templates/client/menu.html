@@ -1,0 +1,21 @@
+{% extends 'client/layout.html' %}
+{% block title %}Menu{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a class="black-text" href="/">Inicio</a></li>
+<li class="breadcrumb-item active">Men&uacute;</li>
+{% endblock %}
+{% block content %}
+	<h2 class="mt-40 mb-20">Men&uacute;</h2>
+	<ul class="menu-categories-list">
+		{% for category in categoriesData %}
+		<li>
+			<a href="/menu/category?id={{ category[0]|string }}">
+				<div class="menu-category">
+					<img src="{{ url_for('static', filename='client/' + category[2]) }}" alt="Imagen de {{ category[1] }}">
+					<p>{{ category[1] }}&nbsp;&nbsp;<i class="fas fa-angle-right"></i></p>
+				</div>
+			</a>
+		</li>
+		{% endfor %}
+	</ul>
+{% endblock %}

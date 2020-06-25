@@ -1,0 +1,50 @@
+{% extends 'client/layout.html' %}
+{% block title %}Ingresar{% endblock %}
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a class="black-text" href="/">Inicio</a></li>
+    <li class="breadcrumb-item active">Ingresar</li>
+{% endblock %}
+{% block content %}
+<div class="jumbotron">
+    <div class="col-md-10" style="margin: 0 auto;">
+        <h2 class="mb-40">Inicio de Sesi&oacute;n</h2>
+        <div id="wrongEmailAlert" class="alert alert-danger d-none" role="alert">
+            El correo ingresado no ha sido registrado
+        </div>
+        <div id="wrongPasswordAlert" class="alert alert-danger d-none" role="alert">
+            La contraseña ingresada es incorrecta
+        </div>
+        <form action="/login" method="POST" id='registration-form'>
+            <div class="form-group">
+                <label for="loginEmail" class="animated-label">Correo Electr&oacute;nico</label>
+                <input id="loginEmail" type="email" class="form-control" name="loginEmail" aria-describedby="emailHelp" placeholder="Ingrese su correo electrónico" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword" class="animated-label">Contraseña</label>
+                <input id="loginPassword" type="password" class="form-control" name="loginPassword" placeholder="Ingrese su contraseña" required>
+            </div>
+            <strong><small><p>Sus datos no ser&aacute;n compartidos con terceras personas.</p></small></strong>
+            <div class="text-center">
+                <a href="/account/password_reset" class="text-danger font-weight-bold margin-0 padding-0">¿Ha olvidado su contraseña? Haga clic aqu&iacute;.</a>
+                <hr />
+                <button type="submit" class="btn btn-danger col-md-4 m-0">Iniciar Sesi&oacute;n</button>
+                <p class="mt-40">¿No tiene cuenta? Por favor registrese.</p>
+                <a href="/signup" class="btn btn-danger col-md-4 m-0">Registrarse</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    let errorMessage={{ request.args.get('error')|tojson|safe }};
+
+    if (errorMessage) {
+        if (errorMessage === 'wrongEmail') {
+            document.querySelector('#wrongEmailAlert').classList.remove('d-none');
+        } else {
+            document.querySelector('#wrongPasswordAlert').classList.remove('d-none');
+        }
+    }
+</script>
+{% endblock %}

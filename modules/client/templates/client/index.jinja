@@ -1,0 +1,109 @@
+{% extends 'client/layout.html' %}
+{% block title %}Inicio{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Inicio</li>
+{% endblock %}
+{% block content %}
+<!-- Facebook plugin SDK -->
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v3.3&appId=613533879013592"></script>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>{{ message }}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<h2 class="mt-40 mb-20">Bienvenidos al Restaurante Mar y Ana</h2>
+<div class="jumbotron p-0">
+        <div id="carouselExampleIndicators" class="carousel slide carousel-fade" data-ride="carousel">
+        <ol class="carousel-indicators">
+            <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+            <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+            <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+            <li data-target="#carouselExampleIndicators" data-slide-to="3"></li>
+            <li data-target="#carouselExampleIndicators" data-slide-to="4"></li>
+        </ol>
+        <div class="carousel-inner">        
+            <div class="carousel-item active">
+                <img class="d-block w-100 product-image" src="{{ url_for('static', filename='client/img/carousel/img1.jpg') }}">
+                <div class="carousel-caption">
+                    <h2 class="animated bounceInRight">Somos confiables</h2>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img class="d-block w-100 product-image" src="{{ url_for('static', filename='client/img/carousel/img2.jpg') }}">
+                <div class="carousel-caption">
+                    <h2 class="animated bounceInRight">Entregamos a tiempo</h2>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img class="d-block w-100 product-image" src="{{ url_for('static', filename='client/img/carousel/img3.jpg') }}">
+                <div class="carousel-caption">
+                    <h2 class="animated bounceInRight">Excelente servicio</h2>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img class="d-block w-100 product-image" src="{{ url_for('static', filename='client/img/carousel/img4.jpg') }}">
+                <div class="carousel-caption">
+                    <h2 class="animated bounceInRight">Ingredientes de calidad</h2>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img class="d-block w-100 product-image" src="{{ url_for('static', filename='client/img/carousel/img5.jpg') }}">
+                <div class="carousel-caption">
+                    <h2 class="animated bounceInRight">Nuestros clientes son prioridad</h2>
+                </div>
+            </div>
+        </div>
+        <a class="carousel-btn carousel-btn-left waves-effect waves-light" href="#carouselExampleIndicators" role="button" data-slide="prev">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+        <a class="carousel-btn carousel-btn-right waves-effect waves-light" href="#carouselExampleIndicators" role="button" data-slide="next">
+            <i class="fas fa-chevron-right"></i>
+         </a>
+    </div> 
+</div>
+<h2 class="mb-40 mt-40"></h2>
+<div class="row">
+    <div class="col-12 col-sm-12 col-md-12 col-lg-8">
+        <div class="iframe-container shadow">
+            <iframe class="youtube-iframe" src="https://www.youtube.com/embed/dGgCO1GNM0Y" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
+    <div class="col-12 col-sm-12 col-md-12 col-lg-4">
+        <div class="fb-container">
+            <div class="fb-page" data-href="https://www.facebook.com/Restaurante-y-Pizerr%C3%ADa-Mar-y-Ana-118253778276530/" data-tabs="timeline" data-width="" data-height="" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"><blockquote cite="https://www.facebook.com/Restaurante-y-Pizerr%C3%ADa-Mar-y-Ana-118253778276530/" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/Restaurante-y-Pizerr%C3%ADa-Mar-y-Ana-118253778276530/">Restaurante y Pizerría Mar y Ana</a></blockquote></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+$(window).on('load', function() {
+    setTimeout(function() {
+        changeFBPlugin();
+    }, 1500);
+});
+$(window).on('resize', function() {
+    setTimeout(function() {
+        changeFBPlugin();
+    }, 500);
+});
+function changeFBPlugin() {
+    let containerWidth = (Number($('.fb-container').width()) - Number($('.fb-container').css('padding-left').replace("px", ""))).toFixed(0);
+    let containerHeight = (Number($('.fb-container').height()) + (Number(($('.fb-container').css('padding-top').replace("px", "")*2)))).toFixed(0);
+    if (!isNaN(containerWidth) && !isNaN(containerHeight)) {
+      $(".fb-page").attr("data-width", containerWidth).attr("data-height", containerHeight);
+   }
+   if (typeof FB !== 'undefined' ) {
+      FB.XFBML.parse();
+   }
+}
+</script>
+{% endblock %}

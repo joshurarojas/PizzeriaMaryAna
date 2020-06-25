@@ -1,0 +1,28 @@
+{% extends 'client/layout.html' %}
+{% block title %}Recuperar contraseña{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="/" class="black-text">Inicio</a></li>
+<li class="breadcrumb-item active">Recuperar contraseña</li>
+{% endblock %}
+{% block content %}
+<div class="jumbotron">
+    <h2 class="mb-40">Recuperaci&oacute;n de contraseña</h2>
+    <div class="all-width">
+        <div class="col-md-8 m-0-auto">
+            {% if request.args.get('status') == 'wrongEmail' %}
+                <div class="alert alert-danger" role="alert">
+                    El correo ingresado no se encuentra asociado a ninguna cuenta.
+                </div>
+            {% endif %}
+            <form action="/account/send_password_reset_code" method="POST">
+                <div class="form-group">
+                    <label for="restoreEmail" class="animated-label">Ingrese el correo electr&oacute;nico asociado a su cuenta</label>
+                    <input type="email" name="restoreEmail" id="restoreEmail" class="form-control" placeholder="Ingrese su correo electronico" required>
+                    <strong><small class="text-danger">Se le enviar&aacute; un c&oacute;digo a su correo para verificar su cuenta.</small></strong>
+                </div>
+                <button type="submit" class="btn btn-amber">Enviar C&oacute;digo</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

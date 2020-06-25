@@ -1,0 +1,46 @@
+{% extends 'client/layout.html' %}
+{% block title %}Contacto{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a class="black-text" href="/">Inicio</a></li>
+<li class="breadcrumb-item active">Contacto</li>
+{% endblock %}
+{% block content %}
+<h2 class="mt-40 mb-40">Contáctenos</h2>
+<div class="row">
+    <div class="col-12 col-md-6">
+        <div class="social-information">
+            <h3>Síguenos en redes sociales </h3>
+            <p> <i style="font-size: 40px;" class="fab fa-facebook-square"></i> Restaurante y Pizerría Mar y Ana</p>
+            <p><i style="font-size: 40px;" class="fab fa-twitter-square"></i> Restaurante y Pizerría Mar y Ana</p>
+            <p><i style="font-size: 40px;" class="fab fa-instagram"></i> Restaurante y Pizerría Mar y Ana</p>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 ">
+        <div class="contact-information">
+            <h3>Consúltanos por los siguientes medios </h3>
+            <p><i style="font-size: 35px;" class="fas fa-phone"></i> </span> 24532121</p>
+            <p><i style="font-size: 35px; padding-left: 10px;" class="fas fa-mobile-alt"></i> </span> 87659801</p>
+            <p><i style="font-size: 35px;" class="fas fa-envelope"></i> pizzeria@gmail.com</p>
+        </div>
+    </div>
+</div>
+<h2 class="mt-40 mb-40">C&oacute;mo encontrarnos</h2>
+<div class="map-container">
+    <iframe
+        class="map"
+        src="https://maps.google.com/maps?width=700&amp;height=440&amp;hl=en&amp;q=Pizzer%C3%ADa%20Mar%20y%20Ana%2C%20Avenida%204%2C%20Alajuela%20Province%2C%20Alfaro%20Ruiz%2C%20Costa%20Rica+(T%C3%ADtulo)&amp;ie=UTF8&amp;t=&amp;z=10&amp;iwloc=B&amp;output=embed"
+        frameborder="0" scrolling="no" marginheight="0" marginwidth="0">
+    </iframe>
+    <div
+        style="position: relative;width: 70%;bottom: 10px;left: 0;right: 0;margin-left: auto;margin-right: auto;color: #000;text-align: center;">
+        <small style="line-height: 1.8;font-size: 2px;background: #fff;">Powered by <a
+                href="https://embedgooglemaps.com/es/%22%3Ehttps://embedgooglemaps.com/es/"></a> & <a href="
+                https://recargalebara.es/%22%3Erecargalebara.es"></a> 
+        </small>
+    </div>
+        <style>
+            #gmap_canvas img{max-width:none!important;background:none!important}
+        </style>
+    </div>
+</div>
+{% endblock %}

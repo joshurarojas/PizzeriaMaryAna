@@ -1,0 +1,58 @@
+{% extends 'client/layout.html' %}
+{% block title %}Resgistro{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a class="black-text" href="/">Inicio</a></li>
+<li class="breadcrumb-item active">Registro</li>
+{% endblock %}
+{% block content %}
+<div class="jumbotron">
+    <div class="col-md-10" style="margin: 0 auto;">
+    <h2 class="mb-40">Ingresa tus datos</h2>
+    <form action="/signup" method="POST" id='registration-form'>
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="registrationName" class="animated-label">Nombre</label>
+                <input type="text" class="form-control" id="registrationName" name="registrationName" placeholder="Ingrese su nombre y apellidos" required>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="registrationPhone" class="animated-label">N&uacute;mero de Tel&eacute;fono</label>
+                <input type="number" class="form-control" id="registrationPhone" name="registrationPhone" placeholder="Ingrese su número de teléfono" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="registrationEmail" class="animated-label">Correo Electr&oacute;nico</label>
+            <input type="email" class="form-control" id="registrationEmail" name="registrationEmail" aria-describedby="emailHelp" placeholder="Ingrese su correo electrónico" required>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="registrationPassword" class="animated-label">Contraseña</label>
+                <input type="password" class="form-control" id="registrationPassword" name="registrationPassword" placeholder="Ingrese su contraseña" required>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="registrationConfirmPassword" class="animated-label">Confirmar Contraseña</label>
+                <input type="password" class="form-control" id="registrationConfirmPassword" name="registrationConfirmPassword" placeholder="Confirme su contraseña" required>
+            </div>
+        </div>
+        <strong><small><p>Sus datos no ser&aacute;n compartidos con terceras personas.</p></small></strong>
+        <hr />
+        <div class="text-center">
+            <button type="submit" class="btn btn-danger col-md-4">Registrarse</button>
+            <p class="mt-20">¿Ya tiene cuenta? Por favor ingrese.</p>
+            <a href="/login" class="btn btn-danger col-md-4 m-0">Iniciar Sesi&oacute;n</a>
+        </div>
+    </form>
+    </div>
+</div>
+<script>
+    var formInputs = document.querySelectorAll('#registration-form input');
+    formInputs.forEach(input => {
+        input.addEventListener('change', function(input) {
+            if (input.target.value.length > 0) {
+                input.target.parentElement.classList.add('not-empty');
+            } else {
+                input.target.parentElement.classList.remove('not-empty');
+            }
+        });
+    });
+</script>
+{% endblock %}

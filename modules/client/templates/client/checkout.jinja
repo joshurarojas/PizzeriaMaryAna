@@ -1,0 +1,402 @@
+{% extends 'client/layout.html' %}
+{% block title %}Carro de Productos{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a class="black-text" href="/">Inicio</a></li>
+<li class="breadcrumb-item active">Carro de compras</li>
+{% endblock %}
+{% block content %}
+<div class="mt-40">
+    <div id="toggleProductOrdersSection" class="toggle-section grey lighten-4 mb-4 pointer col-12">
+        <div class="row">
+            <div><span>1</span></div>
+            <span>Carro de compras</span>
+            <span id="spanToggleProductOrders" class="span-toggle opened"></span>
+        </div>
+    </div>
+    <div class="row" id="productOrdersSection">
+        <div class="col-md-8">
+            <div class="table-responsive">
+                <table class="table table-orders">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Imagen</th>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th colspan="2">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableOrdersBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="product-orders-payment-information">
+                <div class="product-orders-total">
+                    <p class="font-weight-bold m-0">TOTAL: ₡<span id="productOrdersTotalAmount"></span></p>
+                </div>
+            </div>
+            <button class="btn btn-danger btn-remove-all btn-sm mt-3 ml-auto" onclick="removeAllProductsFromCart()"><i class="fas fa-trash"></i>&nbsp;&nbsp;Vaciar carrito</button>
+        </div>
+    </div>
+    <div id="toggleDeliveryDetailsSection" class="toggle-section grey lighten-4 mb-4 pointer col-12">
+        <div class="row">
+            <div><span>2</span></div>
+            <span>Detalles de envío</span>
+            <span id="spanToggleDeliveryDetails" class="span-toggle closed"></span>
+        </div>
+    </div>
+    <div class="row" id="deliveryDetailsSection">
+        <div class="col-md-12 mb-4">ENTREGA</div>
+    </div>
+    <div id="togglePaymentMethodsSection" class="toggle-section grey lighten-4 mb-4 pointer col-12">
+        <div class="row">
+            <div><span>3</span></div>
+            <span>Métodos de pago</span>
+            <span id="spanTogglePaymentMethods" class="span-toggle closed"></span>
+        </div>
+    </div>
+    <div id="paymentMethodsSection" class="payment-methods-section">
+        Seleccione un método de pago
+        <div class="col-md-12">
+            <div class="custom-control custom-radio custom-control-inline payment-radio-container" data-toggle="tooltip" data-placement="right" title="Pagar con Stripe">
+                <input type="radio" class="custom-control-input" id="customRadio" name="paymentRadios" value="stripe" checked>
+                <label class="custom-control-label" for="customRadio"><img class="payment-radio-img" src="{{ url_for('static', filename='client/img/stripe-payment.png') }}" /></label>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="custom-control custom-radio custom-control-inline payment-radio-container" data-toggle="tooltip" data-placement="right" title="Pagar en efectivo">
+                <input type="radio" class="custom-control-input" id="customRadio2" name="paymentRadios" value="cash">
+                <label class="custom-control-label" for="customRadio2"><img class="payment-radio-img" src="{{ url_for('static', filename='client/img/cash-payment.png') }}" /></label>
+            </div> 
+        </div>
+        <button id="btnProcessPayment" type="button" class="btn btn-success"><i class="fas fa-paper-plane"></i> Realizar pago</button>
+    </div>
+</div>
+<div class="darkness"></div>
+{# Start Processing Payment div #}
+<div class="loading-container-outer">
+    <div class="loading-container-middle">
+        <div class="loading-container">
+            <h5 id="loading-title" class="loading-title">Enviandote a los servidores seguros de Stripe</h5>
+            <div class="spinner-border text-danger" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+</div>
+{# End Processing Payment div #}
+{% endblock %}
+{% block scripts %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    let paymentSelected = 'stripe';
+
+    $('input[type=radio][name=paymentRadios]').on('change', (event) => {
+        if (event.target.value == 'stripe') {
+            paymentSelected = 'stripe';
+        } else if (event.target.value == 'cash') {
+            paymentSelected = 'cash';
+        }
+    });
+    $('#btnProcessPayment').on('click', function (e) {
+        e.preventDefault();
+        if (productOrdersParsed === null || productOrdersParsed.length === 0) {
+            showNotification('Debe tener al menos 1 producto', 'info');
+        } else {
+            if (paymentSelected == 'stripe') {
+                goToStripeCheckout();
+            } else if (paymentSelected == 'cash') {
+                console.log('CASH');
+            }
+        }        
+    });
+    $(document).ready(function () {
+        $('#deliveryDetailsSection').hide();
+        $('#paymentMethodsSection').hide();
+
+        $('#toggleProductOrdersSection').on('click', function (e) {
+            e.preventDefault();
+            $('#productOrdersSection').slideToggle();
+            $('#spanToggleProductOrders').toggleClass('opened closed');
+        });
+
+        $('#toggleDeliveryDetailsSection').on('click', function (e) {
+            e.preventDefault();
+            $('#deliveryDetailsSection').slideToggle();
+            $('#spanToggleDeliveryDetails').toggleClass('opened closed');
+        });
+
+        $('#togglePaymentMethodsSection').on('click', function (e) {
+            e.preventDefault();
+            $('#paymentMethodsSection').slideToggle();
+            $('#spanTogglePaymentMethods').toggleClass('opened closed');
+        });
+    });
+
+    let productOrders = localStorage.getItem('productOrders');
+    let productOrdersParsed = JSON.parse(productOrders);
+
+    if (productOrdersParsed == null || productOrdersParsed.length == 0) {
+        let trEmptyCart = document.createElement('tr');
+        let tdEmptyCart = document.createElement('td');
+        tdEmptyCart.colSpan = "5";
+        trEmptyCart.appendChild(tdEmptyCart);
+
+        let divCartEmptyContainer = document.createElement('div');
+        divCartEmptyContainer.classList.add('cart-empty-container');
+        
+        let divCartEmpty = document.createElement('div');
+        divCartEmpty.classList.add('cart-empty');
+        divCartEmpty.innerHTML = '<i class="fas fa-shopping-cart"></i>';
+
+        let pCartEmpty = document.createElement('p');
+        pCartEmpty.textContent = 'No hay productos en el carro de compras';
+        
+        divCartEmptyContainer.append(divCartEmpty, pCartEmpty);
+
+        tdEmptyCart.appendChild(divCartEmptyContainer);
+        document.querySelector('#tableOrdersBody').appendChild(trEmptyCart);
+        document.querySelector('#productOrdersTotalAmount').textContent = 0;
+    } else {
+        let productOrdersTotalAmount = 0;
+        productOrdersParsed.forEach((productOrder) => {
+            // Product order row
+            let trProductOrder = document.createElement('tr');
+            trProductOrder.setAttribute('product-id', `${productOrder.idProduct}`);
+            trProductOrder.setAttribute('product-type-id', `${productOrder.idPrice}`);
+            // Product order image column
+            let tdProductOrderImg = document.createElement('td');
+            tdProductOrderImg.style.minWidth = '95px';
+            tdProductOrderImg.style.maxWidth = '95px';
+            tdProductOrderImg.style.width = '95px';
+            let imgProductOrderImage = document.createElement('img');
+            imgProductOrderImage.classList.add('product-order-img');
+            imgProductOrderImage.src = `static/client/${productOrder.productImgSmall}`;
+            tdProductOrderImg.appendChild(imgProductOrderImage);
+            // Product order name column
+            let tdProductOrderName = document.createElement('td');
+            let pProductOrderName = document.createElement('p');
+            pProductOrderName.classList.add('product-order-name');
+            pProductOrderName.textContent = productOrder.productName;
+            // Product type
+            let pProductOrderType = document.createElement('p');
+            pProductOrderType.classList.add('product-order-type');
+            pProductOrderType.textContent = productOrder.productType;
+            tdProductOrderName.append(pProductOrderName, pProductOrderType);
+            // Product order price column
+            let tdProductOrderPrice = document.createElement('td');
+            tdProductOrderPrice.textContent = `₡${productOrder.productPrice} c/u`;
+            // Product order quantity column
+            let tdProductOrderQuantity = document.createElement('td');
+            tdProductOrderQuantity.style.minWidth = '155px';
+            tdProductOrderQuantity.style.maxWidth = '155px';
+            tdProductOrderQuantity.style.width = '155px';
+            // Button for reducing product order quantity
+            let aReduceProductOrderQuantity = document.createElement('a');
+            aReduceProductOrderQuantity.setAttribute('onclick', `reduceOrIncreaseProductQuantity(${productOrder.idProduct}, ${productOrder.idPrice}, ${productOrder.productPrice}, "minus")`);
+            aReduceProductOrderQuantity.classList.add('btn-reduce-quantity');
+            aReduceProductOrderQuantity.innerHTML = '<i class="fas fa-minus"></i>';
+            // Span for product order quantity
+            let spanProductOrderQuantity = document.createElement('span');
+            spanProductOrderQuantity.classList.add('span-quantity');
+            spanProductOrderQuantity.textContent = `${productOrder.productQuantity}`;
+            // Button for increasing product order quantity
+            let aIncreaseProductOrderQuantity = document.createElement('a');
+            aIncreaseProductOrderQuantity.setAttribute('onclick', `reduceOrIncreaseProductQuantity(${productOrder.idProduct}, ${productOrder.idPrice}, ${productOrder.productPrice}, "plus")`);
+            aIncreaseProductOrderQuantity.classList.add('btn-increase-quantity');
+            aIncreaseProductOrderQuantity.innerHTML = '<i class="fas fa-plus"></i>';
+            tdProductOrderQuantity.appendChild(aReduceProductOrderQuantity);
+            tdProductOrderQuantity.appendChild(spanProductOrderQuantity);
+            tdProductOrderQuantity.appendChild(aIncreaseProductOrderQuantity);
+            // Product order subtotal column
+            let tdProductOrderSubtotal = document.createElement('td');
+            tdProductOrderSubtotal.innerHTML = `₡<span>${productOrder.productQuantity * productOrder.productPrice}</span>`;
+            // Remove product order column
+            let tdRemoveProductOrder = document.createElement('td');
+            tdRemoveProductOrder.style.minWidth = '50px';
+            tdRemoveProductOrder.style.maxWidth = '50px';
+            tdRemoveProductOrder.style.width = '50px';
+            let btnRemoveProductOrder = document.createElement('button');
+            btnRemoveProductOrder.classList.add('btn', 'btn-custom-orange', 'btn-sm', 'm-0', 'p-2');
+            let iRemoveProductOrder = document.createElement('i');
+            iRemoveProductOrder.classList.add('fas', 'fa-times');
+            btnRemoveProductOrder.setAttribute('onclick', `removeProductFromCart(${productOrder.idProduct}, ${productOrder.idPrice})`);
+            btnRemoveProductOrder.setAttribute('data-toggle', 'tooltip');
+            btnRemoveProductOrder.setAttribute('data-placement', 'right');
+            btnRemoveProductOrder.setAttribute('title', 'Remover producto');
+            btnRemoveProductOrder.appendChild(iRemoveProductOrder);
+            tdRemoveProductOrder.append(btnRemoveProductOrder);            
+            // Add columns to product order row
+            trProductOrder.append(tdProductOrderImg, tdProductOrderName, tdProductOrderPrice, tdProductOrderQuantity, tdProductOrderSubtotal, tdRemoveProductOrder);
+            // Add product order row to table orders body
+            document.querySelector('#tableOrdersBody').append(trProductOrder);
+
+            productOrdersTotalAmount += parseInt(`${productOrder.productQuantity * productOrder.productPrice}`);
+
+        });
+        document.querySelector('#productOrdersTotalAmount').textContent = productOrdersTotalAmount;
+    };
+
+    // This method remove all products from the cart
+    function removeAllProductsFromCart() {
+        if (!localStorage.getItem('productOrders')) {
+            showNotification('No hay productos en el carro', 'info');
+        } else {    
+            localStorage.removeItem('productOrders');
+            let tableOrdersBody = document.querySelector('#tableOrdersBody').children;
+            for (let i = tableOrdersBody.length - 1; i >= 0; i--) {
+                tableOrdersBody[i].remove();
+            };
+            let trEmptyCart = document.createElement('tr');
+            let tdEmptyCart = document.createElement('td');
+            tdEmptyCart.colSpan = "5";
+            trEmptyCart.appendChild(tdEmptyCart);
+
+            let divCartEmptyContainer = document.createElement('div');
+            divCartEmptyContainer.classList.add('cart-empty-container');
+            
+            let divCartEmpty = document.createElement('div');
+            divCartEmpty.classList.add('cart-empty');
+            divCartEmpty.innerHTML = '<i class="fas fa-shopping-cart"></i>';
+
+            let pCartEmpty = document.createElement('p');
+            pCartEmpty.textContent = 'No hay productos en el carro de compras';
+            
+            divCartEmptyContainer.append(divCartEmpty, pCartEmpty);
+
+            tdEmptyCart.appendChild(divCartEmptyContainer);
+            document.querySelector('#tableOrdersBody').appendChild(trEmptyCart);
+            document.querySelector('#productOrdersTotalAmount').textContent = 0;
+
+            showNotification('Todos los productos fueron removidos', 'success');
+        };
+    };
+
+    // This method remove just one element from the cart
+    function removeProductFromCart(idProduct, idProductPrice) {
+        // Remove product from cart graphically (DOM)
+        let trProductOrdersChilds = document.querySelector('#tableOrdersBody').children;
+        for (let i = trProductOrdersChilds.length - 1; i >= 0; i--) {
+            if (trProductOrdersChilds[i].getAttribute('product-id') == idProduct
+                && trProductOrdersChilds[i].getAttribute('product-type-id') == idProductPrice) {
+                let productOrderSubtotal = trProductOrdersChilds[i].children[4].children[0].textContent;
+                document.querySelector('#productOrdersTotalAmount').textContent = document.querySelector('#productOrdersTotalAmount').textContent - productOrderSubtotal;
+                trProductOrdersChilds[i].remove();
+                break;
+            };
+        };
+        // Remove product from localStorage
+        for (let i = 0; i < productOrdersParsed.length; i++) {
+            let po = productOrdersParsed[i];
+            if (po.idProduct === idProduct && po.idPrice === idProductPrice) {
+                productOrdersParsed.splice(i, 1);
+                break;
+            };
+        };
+        // Add graphical information if the cart is empty after removing product
+        if (trProductOrdersChilds.length == 0) {
+            let trEmptyCart = document.createElement('tr');
+            let tdEmptyCart = document.createElement('td');
+            tdEmptyCart.colSpan = "5";
+            trEmptyCart.appendChild(tdEmptyCart);
+
+            let divCartEmptyContainer = document.createElement('div');
+            divCartEmptyContainer.classList.add('cart-empty-container');
+            
+            let divCartEmpty = document.createElement('div');
+            divCartEmpty.classList.add('cart-empty');
+            divCartEmpty.innerHTML = '<i class="fas fa-shopping-cart"></i>';
+
+            let pCartEmpty = document.createElement('p');
+            pCartEmpty.textContent = 'No hay productos en el carro de compras';
+            
+            divCartEmptyContainer.append(divCartEmpty, pCartEmpty);
+
+            tdEmptyCart.appendChild(divCartEmptyContainer);
+            document.querySelector('#tableOrdersBody').appendChild(trEmptyCart);
+            document.querySelector('#productOrdersTotalAmount').textContent = 0;
+        };
+        // Update local storage and navbar cart counter display
+        localStorage.setItem('productOrders', JSON.stringify(productOrdersParsed));
+        document.querySelector('#cart-counter').textContent = productOrdersParsed.length;
+        // Show notification to user
+        showNotification('Producto removido', 'danger');
+    };
+
+    function reduceOrIncreaseProductQuantity(idProduct, idProductPrice, price, action) {
+        let trsProductOrders = document.querySelector('#tableOrdersBody').children;
+        for (let i = trsProductOrders.length - 1; i >= 0; i--) {
+            if (trsProductOrders[i].getAttribute('product-id') == idProduct
+                && trsProductOrders[i].getAttribute('product-type-id') == idProductPrice) {
+                let quantitySpan = trsProductOrders[i].children[3].children[1];
+                let subtotalSpan = trsProductOrders[i].children[4];
+                let spanProductOrdersTotalAmount = document.querySelector('#productOrdersTotalAmount');
+                if (action === 'plus') {
+                    quantitySpan.textContent = parseInt(quantitySpan.textContent) + 1;
+                    subtotalSpan.textContent = '₡' + (price * quantitySpan.textContent);
+                    spanProductOrdersTotalAmount.textContent = parseInt(spanProductOrdersTotalAmount.textContent) + price;
+                } else {
+                    if (quantitySpan.textContent === '1') {
+                        showNotification('La cantidad debe ser mayor a 0', 'info');
+                    } else {
+                        quantitySpan.textContent = parseInt(quantitySpan.textContent) - 1;
+                        subtotalSpan.textContent = '₡' + (price * quantitySpan.textContent);
+                        spanProductOrdersTotalAmount.textContent = parseInt(spanProductOrdersTotalAmount.textContent) - price;
+                    }
+                }
+                break;
+            };
+        };
+
+        for (let i = 0; i < productOrdersParsed.length; i++) {
+            let po = productOrdersParsed[i];
+            if (po.idProduct === idProduct && po.idPrice === idProductPrice) {
+                if (action === 'plus') {
+                    po.product
+                    po.productQuantity++;
+                } else {
+                    if (po.productQuantity > 1) {
+                        po.productQuantity--;
+                    }
+                }
+                break;
+            };
+        };
+        // Update local storage and navbar cart counter display
+        localStorage.setItem('productOrders', JSON.stringify(productOrdersParsed));
+    }
+
+    // This method send the shopping cart data to stripe and redirect to stripe checkout
+    function goToStripeCheckout() {
+        document.querySelector('.darkness').style.display = 'block';
+        document.querySelector('.loading-container-outer').style.display = 'table';
+        let productOrders = localStorage.getItem('productOrders');
+        
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            data: productOrders,
+            dataType: 'json',
+            url: '{{ url_for('client.checkout') }}',
+            success: e => {
+                console.log(e);
+                setTimeout(() => {
+                    const stripe = Stripe({{ pub_key|tojson|safe }});
+                    stripe.redirectToCheckout({
+                        sessionId: e.stripe_id
+                    }).then(result => {
+                        
+                    });
+                }, 3000);
+            },
+            error: error => {
+                console.log(error.responseText);
+                document.querySelector('.darkness').style.display = 'none';
+                document.querySelector('#loading-title').textContent = '';
+                document.querySelector('.loading-container').style.display = 'none';
+            }
+        });
+    };
+</script>
+{% endblock %}

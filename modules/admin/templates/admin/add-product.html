@@ -1,0 +1,39 @@
+{% extends 'admin/layout.html' %}
+{% block content %}
+<div class="box col-md-8">
+        <div class="box-header with-border">
+          <h3 class="box-title">Agregar un producto</h3>
+        </div>
+        <!-- /.box-header -->
+        <!-- form start -->
+        <form action="/admin/products/add" method="POST" enctype="multipart/form-data">
+          <div class="box-body">
+            <div class="col-md-4 p-0">
+                <div class="form-group">
+                    <label for="productName">Nombre del producto</label>
+                    <input type="text" class="form-control" name="productName" id="productName"  placeholder="Ingrese el nombre del producto" required>
+                </div>
+                <div class="form-group">
+                    <label for="productDescription">Descripción del producto</label>
+                    <textarea type="text" class="form-control" name="productDescription" id="productDescription" placeholder="Ingrese la descripción del producto"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="productSmallImages">Imagen pequeña del producto</label>
+                    <input type="file" class="form-control" name="productSmallImages" id="productSmallImages" accept="image/*" required>
+                </div>
+                <div class="form-group">
+                    <label for="productImgs">Imágenes grandes del producto</label>
+                    <input type="file" class="form-control" name="productLargeImages" id="productLargeImages" accept="image/*" multiple required>
+                </div>
+            </div>
+          </div>
+          <!-- /.box-body -->
+          <div class="box-footer">
+            <a class="btn btn-danger mr-6" href="/admin/products"><i class="fas fa-arrow-circle-left mr-6"></i>Regresar</a>
+            <button type="submit" class="btn btn-primary" ><i class="fas fa-save mr-6"></i>Guardar</button>
+          </div>
+          <!-- /.box-footer -->
+        </form>
+      </div>
+{% endblock %}
+
